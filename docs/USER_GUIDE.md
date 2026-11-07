@@ -103,3 +103,7 @@ Errors appear in red under the translation in **Recent translations**, with the 
 | *Authentication failed …* | The API key is wrong. Ask your administrator to check Settings. |
 | *Your Supertext translation limit is exceeded* | The Supertext plan's limit is used up. Ask your administrator. |
 | *No Supertext API key yet* | Ask your administrator to add it under Settings. |
+
+## Support
+
+Questions, problems or ideas: use the [Supertext support form](https://integrations.supertext.com/en/support?platform=shopify). Mention the version of Shopify and of the plugin, what you did and what you expected; an error message helps a lot. You get an answer by email, in your language.
