@@ -18,7 +18,9 @@
     "graphql-codegen": "graphql-codegen",
     "vite": "vite",
     "typecheck": "react-router typegen && tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "docs:movie": "npm --prefix test/docs install --no-audit --no-fund --no-package-lock && node test/docs/movie.mjs",
+    "docs:movie:install": "npm --prefix test/docs install --no-audit --no-fund --no-package-lock && node test/docs/movie-install.mjs"
   },
   "type": "module",
   "engines": {

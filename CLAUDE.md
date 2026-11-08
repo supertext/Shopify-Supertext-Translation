@@ -68,6 +68,8 @@ The demo shop is a Shopify development store, so the CMS-style `DEMO_*` accounts
 
 The user guide and installation guide include screenshots of the real UI, taken from the demo store by a committed script against a stand-in API that returns real translations, stored in `docs/images/`, small, with alt text, and regenerated whenever the UI they show changes. No secrets, no customer data, no local URLs.
 
+Demo movie: `npm run docs:movie` (`test/docs/movie.mjs`, the app's own pages against the stand-ins in `test/docs/stand-in.mjs`, kit in `test/docs/movie/`) records `docs/images/demo.gif` (shown in the README) and an MP4 that isn't committed; `npm run docs:movie:install` (`test/docs/movie-install.mjs`) records the install and configuration movie (MP4 only). Both need `npm run build` and an empty `DATABASE_URL`; see `docs/DEVELOPER.md` → *Demo movie*.
+
 ## Shared Supertext protocol
 
 AI file translation API v1, same as the WordPress plugin: POST HTML file → poll status → GET translation → DELETE. Details in `docs/DEVELOPER.md`.

@@ -48,6 +48,7 @@ scripts/start.mjs           production start: create database, migrate, serve
 scripts/vendor-sdk.sh       updates the bundled SDK
 scripts/vendor-plugin-health.sh  updates the bundled Plugin Health
 test/                       Vitest unit tests with fake Shopify and fake Supertext
+test/docs/                  the docs movies: scripts, stand-ins for Shopify and Supertext, the movie kit (see *Demo movie*)
 shopify.app.toml            app configuration: client ID, URLs, scopes, webhooks
 ```
 
@@ -217,6 +218,30 @@ Setting it up (once, by hand, because development stores can't be created or see
 3. Add a few sample products, a page and a blog post in English.
 4. Settings → Users: add staff accounts for Supertext staff (full permissions) and an editor-level account with *Apps* permission for tests and screenshots. Passwords stay in Keeper, never in the repo or chat.
 5. Install the app from the Dev Dashboard (app → Install app → the dev store), and enter the API key under Settings, or set `SUPERTEXT_API_KEY` on Railway.
+
+## Demo movie
+
+`docs/images/demo.gif` (at the top of the README) and a narrated MP4 are recorded by `test/docs/movie.mjs` with Supertext's shared movie kit (`test/docs/movie/movie-kit.mjs` and `assets/`: intro and outro cards, caption bar, cursor, cuts the waiting time; Inter under the SIL OFL, `assets/fonts/Inter-LICENSE.txt`). The kit is the same in every Supertext plugin repo: don't restyle it here.
+
+The movies need no Shopify store. `test/docs/movie/env.mjs` serves the app's production build in the script's own process and answers every request the app makes to Shopify and Supertext in-process with the stand-ins in `test/docs/stand-in.mjs`: the Admin GraphQL operations the app uses, for a sample shop (English, German, French; three products, `test/docs/samples.json`), and the Supertext API v1 with real translations of the sample texts (it holds each status answer, so the waiting state is visible; the movie cuts it). Anything else the app tries to reach is refused, so nothing reaches Shopify, Supertext or the Commando Center. The pages are the real embedded pages with Shopify's real Polaris script from cdn.shopify.com; only what the Shopify admin around the app provides is stood in: the offline session (seeded in the database, as Shopify's token exchange would leave it), a session token signed with the demo's own app secret (`authenticate.admin()` checks it as in production), and a small App Bridge stand-in that adds that token to the app's own requests, which is what App Bridge does inside the admin. The browser loads nothing but the app and cdn.shopify.com; the app's navigation (shown in Shopify's sidebar, not in the app's frame) is hidden, and the page sits on the admin's grey background.
+
+```bash
+pip install piper-tts                                  # the voice (once)
+npm run build                                          # the movies use the production build
+DATABASE_URL=postgresql://…/empty_db npm run docs:movie           # README GIF + MP4
+DATABASE_URL=postgresql://…/empty_db npm run docs:movie:install   # install and configuration MP4
+```
+
+`DATABASE_URL` is an empty PostgreSQL database just for the movies (migrated on start; the demo shop's rows are reset). `CHROME=/path/to/chrome` uses another Chromium than Playwright's own (Playwright is installed into `test/docs/node_modules` by the npm scripts, not into the app); `MOVIE_PORT` (default 8796); `MOVIE_OUT` for the MP4's path. Behind an HTTP proxy, add `NODE_USE_ENV_PROXY=1` so the script can fetch cdn.shopify.com. Headless Chrome counts as a bot for the app (`authenticate.admin()` answers 410), so the scripts use a normal Chrome user agent.
+
+- **Demo movie** (`test/docs/movie.mjs`, about 50 s): the Translate page with the products in English, *Linen apron* ticked, German kept and French unticked, *Translate 1 with Supertext*, the running job, and the result (*Done · de · 4 fields translated*). The translated product itself is shown in Shopify's Translate & Adapt app, which is Shopify's UI and isn't shown; the script checks that the stand-in received the German texts. Record it again when the Translate page changes.
+- **Install movie** (`test/docs/movie-install.mjs`, about 75 s, MP4 only): the app is hosted, so there are no install commands; installing it from the Shopify App Store is Shopify's own screens, summed up in one spoken line over the app's first page (*Add your Supertext API key*). Then *Settings*: the fake key `st-demo-0000-0000-0000` and where to get a real one, *Languages* (the shop's languages come from Shopify's Settings → Languages; German set to *Swiss High German (de-CH)*, *Translation review* left off), *Save* with the key check (*the connection to Supertext works*), and the Translate page where editors start. Record it again when the settings change.
+
+Both MP4s are narrated with [Piper](https://pypi.org/project/piper-tts/) (`pip install piper-tts`): the kit's `say()` speaks each step's line, shows its caption and holds until the line is finished; the time spent making the speech is cut. The voice model (63 MB, pinned revision, checked by SHA-256) downloads itself once into `~/.cache/supertext-movie`. Without Piper, or with `MOVIE_VOICE=0`, the movies are made silent with the captions only. The GIF is silent.
+
+Voice: Piper voice “alba” (en_GB), trained on a dataset from the University of Edinburgh's Centre for Speech Technology Research, CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/)
+
+They need `ffmpeg` and write 1280×720 at 30 fps. The GIF (800 px, 12 fps, keep it under 3 MB) is committed; the MP4s aren't: they go to `test/docs/movie/out/Shopify-Supertext-Translation.mp4` and `…-install.mp4` (git-ignored) or to `MOVIE_OUT`.
 
 ## Dependency updates
 

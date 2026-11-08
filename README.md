@@ -2,6 +2,8 @@
 
 Translate your Shopify store with **Supertext AI**, right from the Shopify admin.
 
+![Demo: a product picked on the Translate page, German chosen, Translate with Supertext clicked, and the translation done a few seconds later](docs/images/demo.gif)
+
 Open **Apps → Supertext Translation**, pick products, collections, pages or blog posts and the languages, and click **Translate with Supertext**. The app translates every text field in the background and writes the results to Shopify's own translation store, so customers see them in your shop and you can review them in Shopify's Translate & Adapt app.
 
 - Products, collections, pages, blog posts and blogs, into all your shop's languages at once
