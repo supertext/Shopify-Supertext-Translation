@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 1.0.0 — 2026-11-10
+
+First stable release. Every plugin release is now tested end to end against the live Supertext API (`.github/workflows/e2e.yml`).
+
 - Changed: building and running the app needs Node.js 22.18 or later (was 22.12): `graphql-config` 6 requires it. The Docker image already uses the latest Node 22.
 - Changed: the pages inside the Shopify admin use Shopify's Polaris web components 2.x (`@shopify/shopify-app-react-router` 4), so they follow the admin's new look.
 - Changed: the app now runs on React 19 (was React 18). No change for merchants.

@@ -82,7 +82,7 @@
       "minimatch": "^11.0.5"
     }
   },
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Supertext AI translation for Shopify: an embedded app that translates products, collections, pages and blog posts into the shop's other languages.",
   "license": "MIT",
   "repository": {
