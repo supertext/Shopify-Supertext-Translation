@@ -255,7 +255,7 @@ React Router majors are ignored too (`react-router` and all `@react-router/*`): 
 
 Prisma majors (`prisma`, `@prisma/client`) wait for `@shopify/shopify-app-session-storage-prisma`, whose 11.x releases require Prisma ^6. `@typescript-eslint/parser` and `@typescript-eslint/eslint-plugin` must always have the same version; Dependabot proposes their majors one at a time, which can't pass, so those majors are ignored and done by hand for both at once.
 
-The app runs on React 19. `@shopify/app-bridge-types` still declares its elements (`<s-app-nav>`, `<ui-modal>`, …) in the global `JSX` namespace, which React 19's types no longer read; `env.d.ts` copies them into `React.JSX`. Remove that block once app-bridge-types declares them there itself. ESLint 10 no longer reads `.eslintrc.cjs`: moving to a flat `eslint.config.js` comes first (see *Known limitations / roadmap*), then lift the `eslint` rule.
+The app runs on React 19. `@shopify/app-bridge-types` still declares its elements (`<s-app-nav>`, `<ui-modal>`, …) in the global `JSX` namespace, which React 19's types no longer read; `env.d.ts` copies them into `React.JSX`. Remove that block once app-bridge-types declares them there itself. ESLint runs on version 9 with a flat `eslint.config.js` (`npm run lint`). ESLint 10 waits for `eslint-plugin-react`, `eslint-plugin-import` and `eslint-plugin-jsx-a11y`, which accept ESLint 9 at most; lift the `eslint` rule when they accept 10.
 
 ## Code quality and security checks
 
@@ -280,7 +280,6 @@ Never tag or create releases by hand.
 
 ## Known limitations / roadmap
 
-- ESLint still uses the legacy `.eslintrc.cjs`; ESLint 10 needs a flat `eslint.config.js` (Dependabot ignores ESLint majors until then).
 - Jobs run inside the web process. A restart (every deploy) stops running jobs; on start, `scripts/start.mjs` marks them *failed* with "Interrupted by an app update", and the merchant starts them again (finished items are kept). A queue that resumes them comes later.
 - Only products, collections, pages, blog posts and blogs. Next: product options and values, metafields, metaobjects, menus, shop policies, theme texts.
 - JSON rich-text fields (metafields of type rich text) and URL handles aren't translated.

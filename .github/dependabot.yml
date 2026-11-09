@@ -25,7 +25,7 @@ updates:
       # @typescript-eslint/parser and /eslint-plugin must share one version: update both by hand
       - dependency-name: "@typescript-eslint/*"
         update-types: ["version-update:semver-major"]
-      # ESLint 10 drops .eslintrc: migrate to eslint.config.js first
+      # ESLint 10: eslint-plugin-react, eslint-plugin-import and eslint-plugin-jsx-a11y peer eslint <= 9
       - dependency-name: "eslint"
         update-types: ["version-update:semver-major"]
     groups:

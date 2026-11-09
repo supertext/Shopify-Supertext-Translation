@@ -25,7 +25,6 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   await authenticate.admin(request);
 
   return {
-    // eslint-disable-next-line no-undef
     apiKey: process.env.SHOPIFY_API_KEY || "",
     // The admin language: Shopify adds ?locale= when it loads the app.
     locale: localeFromRequest(request),
