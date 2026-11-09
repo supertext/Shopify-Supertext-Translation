@@ -28,6 +28,8 @@ updates:
       # ESLint 10: eslint-plugin-react, eslint-plugin-import and eslint-plugin-jsx-a11y peer eslint <= 9
       - dependency-name: "eslint"
         update-types: ["version-update:semver-major"]
+      - dependency-name: "@eslint/js"  # moves with eslint
+        update-types: ["version-update:semver-major"]
     groups:
       minor-and-patch:
         update-types: ["minor", "patch"]
