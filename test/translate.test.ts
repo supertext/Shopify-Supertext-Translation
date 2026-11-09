@@ -153,7 +153,7 @@ describe("processJob", () => {
 });
 
 describe("refused languages", () => {
-  it("sends nothing for an unmapped language and reports unsupported_language once", async () => {
+  it("sends nothing for a language without mapping or default and reports unsupported_language once", async () => {
     const { admin, registered } = fakeAdmin();
     const supertext = fakeSupertext(undefined, { mapping: { de: "de-CH" } });
     const result = await processJob(
@@ -162,11 +162,11 @@ describe("refused languages", () => {
         supertext.translate(segments, locale).catch((error: unknown) => {
           throw localizeError(error);
         }),
-      { resourceIds: ["gid://shopify/Product/1", "gid://shopify/Product/2"], locales: ["fr", "de"], overwrite: false },
+      { resourceIds: ["gid://shopify/Product/1", "gid://shopify/Product/2"], locales: ["en-IE", "de"], overwrite: false },
       async () => undefined,
     );
     expect(result.errors).toEqual([
-      expect.objectContaining({ locale: "fr", code: "unsupportedLanguage", params: { language: "fr" } }),
+      expect.objectContaining({ locale: "en-IE", code: "unsupportedLanguage", params: { language: "en-IE" } }),
     ]);
     expect(supertext.requests.every((r) => r.targetLang === undefined || r.targetLang === "de-CH")).toBe(true);
     expect(supertext.requests.filter((r) => r.method === "POST")).toHaveLength(2);

@@ -23,6 +23,7 @@ import { listResources, shopLocales } from "../translation/shopify.server";
 import { isResourceType, RESOURCE_TYPES } from "../translation/resource-types";
 import type { MessageKey } from "../i18n";
 import { ApiKeyHelp, rich, useI18n } from "../i18n/react";
+import { TranslationFiles } from "../components/TranslationFiles";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { admin, session } = await authenticate.admin(request);
@@ -50,7 +51,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
         locale: l.locale,
         name: l.name,
         published: l.published,
-        // null: not mapped to a Supertext language yet (it can't be translated).
+        // null: no mapping, exact code or default (it can't be translated until chosen in Settings).
         code: resolvedTarget(l.locale, settings.languageCodes),
       })),
     resources: page.resources.map((r) => ({
@@ -285,6 +286,10 @@ export default function Translate() {
           </s-stack>
         </s-section>
       </Form>
+
+      {data.targets.length > 0 && (
+        <TranslationFiles selected={[...selected]} targets={data.targets} />
+      )}
 
       <s-section heading={t("jobs.heading")}>
         {data.jobs.length === 0 ? (

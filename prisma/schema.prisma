@@ -39,6 +39,8 @@ model ShopSettings {
   politeness String   @default("default")
   /// JSON: Shopify locale → Supertext code, e.g. {"de":"de-CH"}; missing = the locale itself if Supertext has it.
   languageCodes String @default("{}")
+  /// JSON: Shopify locales with "Translation review" on, e.g. ["de"]; their translations go through the review service.
+  reviewLocales String @default("[]")
   /// "Send version information to Supertext" (SUPERTEXT_VERSION_REPORTS=0 overrides it).
   versionReports Boolean @default(true)
   /// JSON: the Supertext SDK's reporter state (last reported versions, key check); "" = none yet.

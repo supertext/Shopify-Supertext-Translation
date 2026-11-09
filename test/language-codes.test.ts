@@ -3,7 +3,10 @@ import {
   canonicalCode,
   resolvedSource,
   resolvedTarget,
+  suggestTarget,
   supertextSource,
+  targetName,
+  targetOptions,
   supertextTarget,
   politenessFor,
   supportsPoliteness,
@@ -11,7 +14,7 @@ import {
 import { localizeError, REFUSED_CODES, SupertextError } from "../app/supertext/client.server";
 import { fakeSupertext } from "./fake-supertext";
 
-describe("language codes (no guessing)", () => {
+describe("language codes (mapping, exact match, SDK default)", () => {
   it("uses the shop's mapping first, for targets and the source", () => {
     expect(supertextTarget("de", { de: "de-CH" })).toBe("de-CH");
     expect(supertextSource("en", { en: "en-US" })).toBe("en");
@@ -25,21 +28,46 @@ describe("language codes (no guessing)", () => {
     expect(supertextSource("en", {})).toBe("en");
   });
 
-  it("has no default regions: bare de, fr, en are unsupported until mapped", () => {
-    for (const locale of ["de", "fr", "en", "it", "pt", "zh-CN", "xx"]) {
+  it("uses the SDK default where one is obvious (de → de-DE, zh-TW → zh-Hant, es-ES → es)", () => {
+    expect(supertextTarget("de", {})).toBe("de-DE");
+    expect(supertextTarget("en", {})).toBe("en-US");
+    expect(supertextTarget("fr", {})).toBe("fr-FR");
+    expect(supertextTarget("it", {})).toBe("it-IT");
+    expect(supertextTarget("pt", {})).toBe("pt-PT");
+    expect(supertextTarget("zh-CN", {})).toBe("zh-Hans");
+    expect(supertextTarget("zh-TW", {})).toBe("zh-Hant");
+    expect(supertextTarget("es-ES", {})).toBe("es");
+    expect(supertextTarget("de", { de: "de-CH" })).toBe("de-CH");
+    expect(suggestTarget("de")).toBe("de-DE");
+    expect(suggestTarget("pt-BR")).toBe("pt-BR");
+  });
+
+  it("refuses languages without mapping, match or default", () => {
+    for (const locale of ["en-IE", "de-LI", "gsw", "sr-RS", "xx"]) {
       expect(() => supertextTarget(locale, {}), locale).toThrow(SupertextError);
       expect(resolvedTarget(locale, {}), locale).toBeNull();
+      expect(suggestTarget(locale), locale).toBeNull();
     }
     const error = (() => {
       try {
-        supertextTarget("de", { fr: "fr-CH" });
+        supertextTarget("en-IE", { fr: "fr-CH" });
       } catch (e) {
         return e as SupertextError;
       }
     })();
     expect(error?.code).toBe("unsupported_language");
-    expect(error?.targetLang).toBe("de");
+    expect(error?.targetLang).toBe("en-IE");
     expect(resolvedSource("xx", {})).toBeNull();
+  });
+
+  it("offers Supertext's targets for the combo box, with names in the admin language", () => {
+    const options = targetOptions();
+    expect(options.map((o) => o.code)).toContain("de-CH");
+    expect(options.map((o) => o.code)).not.toContain("de");
+    const deCH = options.find((o) => o.code === "de-CH")!;
+    expect(targetName(deCH, "de")).toMatch(/[Dd]eutsch/);
+    const zurich = options.find((o) => o.code === "gsw-u-sd-chzh")!;
+    expect(targetName(zurich, "de")).toBe(zurich.name);
   });
 
   it("accepts only codes Supertext offers in the settings, in its spelling", () => {

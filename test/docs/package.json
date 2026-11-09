@@ -1,0 +1,9 @@
+{
+  "name": "shopify-supertext-docs-movies",
+  "private": true,
+  "type": "module",
+  "description": "Records the docs movies from the demo against the stand-ins (see docs/DEVELOPER.md → Demo movie)",
+  "dependencies": {
+    "playwright": "1.65.0"
+  }
+}

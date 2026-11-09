@@ -1,5 +1,5 @@
 import prisma from "./db.server";
-import { getSettings, supertextClient } from "./settings.server";
+import { getSettings, supertextClients } from "./settings.server";
 import { localizeError, SupertextError } from "./supertext/client.server";
 import { politenessFor, supertextSource, supertextTarget } from "./translation/language-codes";
 import { reporting } from "./reporting/index.server";
@@ -76,15 +76,18 @@ export async function startJob(shop: string, request: JobRequest): Promise<strin
 async function runJob(id: string, shop: string, request: JobRequest): Promise<void> {
   const { admin } = await unauthenticated.admin(shop);
   const settings = await getSettings(shop);
-  const client = supertextClient(settings);
+  const clients = supertextClients(settings);
+  const review = new Set(settings.reviewLocales);
   const primary = (await shopLocales(admin)).find((l) => l.primary)?.locale;
   let reportedAuthFailure = false;
   const translate: TranslateTexts = async (segments, locale) => {
     try {
-      // No guessing: the shop's mapping, else an exact Supertext code, else unsupported_language (nothing sent).
+      // The shop's mapping, else an exact Supertext code, else the SDK default (de → de-DE, …), else unsupported_language (nothing sent).
       const target = supertextTarget(locale, settings.languageCodes);
       const source = primary ? supertextSource(primary, settings.languageCodes) : null;
-      return await client.translateTexts(segments, target, {
+      // Languages with Translation review on go through the review service; translateTexts
+      // uploads, polls, downloads and deletes with that one client.
+      return await clients.forReview(review.has(locale)).translateTexts(segments, target, {
         sourceLang: source || null,
         politeness: politenessFor(settings.politeness, target),
       });

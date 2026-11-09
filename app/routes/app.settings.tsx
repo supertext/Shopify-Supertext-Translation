@@ -14,15 +14,19 @@ import {
   toPoliteness,
 } from "../settings.server";
 import { appVersion, releaseUrl } from "../version.server";
+import { reviewUrl } from "../supertext/client.server";
 import { EncryptionKeyMissing } from "../crypto.server";
 import { shopLocales } from "../translation/shopify.server";
 import {
   canonicalCode,
   resolvedSource,
   resolvedTarget,
+  suggestTarget,
   supportsPoliteness,
-  TARGET_LANGUAGES,
+  targetName,
+  targetOptions,
 } from "../translation/language-codes";
+import { localeFromRequest } from "../i18n";
 import { reporting, ShopReporting, type ApiKeyCheck } from "../reporting/index.server";
 import type { MessageKey, MessageParams } from "../i18n";
 import { ApiKeyHelp, rich, useI18n } from "../i18n/react";
@@ -46,21 +50,39 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   // Notices app/Shopify updates and a key from the environment; never delays the page.
   reporting.onRequestInBackground(session.shop);
   const version = appVersion();
+  const uiLocale = localeFromRequest(request);
+  const options = targetOptions();
+  const isOption = (code: string) => options.some((o) => o.code === code);
   return {
     languages: locales.map((l) => {
       const code = l.primary
         ? resolvedSource(l.locale, settings.languageCodes)
         : resolvedTarget(l.locale, settings.languageCodes);
+      const saved = settings.languageCodes[l.locale] ?? "";
+      // The combo box: the saved code; a saved bare source code from before 0.4.0
+      // (primary "en") shows as its target (en-US), which is sent as "en" again;
+      // else what the SDK suggests for the locale; else "— choose —".
+      const selected = saved
+        ? isOption(saved)
+          ? saved
+          : (suggestTarget(saved) ?? saved)
+        : (suggestTarget(l.locale) ?? "");
       return {
         locale: l.locale,
         name: l.name,
         primary: l.primary,
-        mapped: settings.languageCodes[l.locale] ?? "",
+        selected,
+        // A saved code the list doesn't offer stays selectable, so nothing is lost.
+        extra: selected && !isOption(selected) ? selected : null,
         code,
+        // Translation review applies to translations into a language, so not to the default language.
+        review: !l.primary && settings.reviewLocales.includes(l.locale),
         noPoliteness: !l.primary && code !== null && !supportsPoliteness(code),
       };
     }),
-    targets: TARGET_LANGUAGES.map((l) => ({ code: l.code, name: l.name })),
+    targets: options.map((l) => ({ code: l.code, name: targetName(l, uiLocale) })),
+    // SUPERTEXT_REVIEW_URL="" on the server: review is off for every language.
+    reviewOffOnServer: reviewUrl() === "",
     hasShopKey: settings.apiKey !== "" || settings.apiKeyUnreadable,
     apiKeyUnreadable: settings.apiKeyUnreadable,
     usesEnvironmentKey: settings.apiKey === "" && effectiveApiKey(settings) !== "",
@@ -90,11 +112,19 @@ export const action = async ({ request }: ActionFunctionArgs): Promise<Result> =
     return { ok: true, key: "settings.removed", check: keyCheckView(result?.check) };
   }
 
-  // Language mapping: only codes Supertext offers, in its own spelling; empty = not mapped.
+  // Language mapping from the combo boxes: only codes Supertext offers, in its own
+  // spelling; "— choose —" (empty) = not mapped (the SDK default, if any, applies).
   const primaryLocale = String(form.get("primaryLocale") ?? "");
   const languageCodes: Record<string, string> = {};
   const invalid: string[] = [];
+  // Translation review per target language (checkbox "review:<locale>"; never the default language).
+  const reviewLocales: string[] = [];
   for (const [name, value] of form.entries()) {
+    if (name.startsWith("review:")) {
+      const locale = name.slice(7);
+      if (value === "on" && locale && locale !== primaryLocale) reviewLocales.push(locale);
+      continue;
+    }
     if (!name.startsWith("code:")) continue;
     const locale = name.slice(5);
     const typed = String(value).trim();
@@ -112,6 +142,8 @@ export const action = async ({ request }: ActionFunctionArgs): Promise<Result> =
       apiKey: String(form.get("apiKey") ?? ""),
       politeness: toPoliteness(form.get("politeness")),
       languageCodes,
+      // With review off on the server the checkboxes are disabled (not submitted): keep the saved choice.
+      reviewLocales: reviewUrl() === "" ? undefined : reviewLocales,
       versionReports: form.get("versionReports") === "on",
     });
   } catch (error) {
@@ -209,36 +241,46 @@ export default function Settings() {
 
         <s-section heading={t("settings.languages.heading")}>
           <s-paragraph>{t("settings.languages.text")}</s-paragraph>
-          <datalist id="supertext-languages">
-            {data.targets.map((l) => (
-              <option key={l.code} value={l.code}>
-                {l.name}
-              </option>
-            ))}
-          </datalist>
           {data.languages.map((l) => (
-            <div key={l.locale} style={{ margin: "8px 0" }}>
+            <div key={l.locale} style={{ margin: "12px 0", maxWidth: 480 }}>
               {l.primary && <input type="hidden" name="primaryLocale" value={l.locale} />}
-              <label htmlFor={`code-${l.locale}`} style={{ display: "block", fontWeight: 600 }}>
-                {l.name} ({l.locale}){l.primary ? t("settings.languages.default") : ""}
-              </label>
-              <input
+              <s-select
                 id={`code-${l.locale}`}
                 name={`code:${l.locale}`}
-                defaultValue={l.mapped}
-                placeholder={l.code ?? t("settings.languages.placeholder")}
-                list="supertext-languages"
-                autoCapitalize="off"
-                autoCorrect="off"
-                spellCheck={false}
-                style={{ ...inputStyle, maxWidth: 200, margin: "4px 0 0" }}
-              />
-              <div style={{ fontSize: "0.9em", color: l.code === null ? "#8e1f0b" : "#6d7175" }}>
+                label={`${l.name} (${l.locale})${l.primary ? t("settings.languages.default") : ""}`}
+                value={l.selected}
+              >
+                <s-option value="">{t("settings.languages.choose")}</s-option>
+                {l.extra && <s-option value={l.extra}>{l.extra}</s-option>}
+                {data.targets.map((o) => (
+                  <s-option key={o.code} value={o.code}>
+                    {`${o.name} (${o.code})`}
+                  </s-option>
+                ))}
+              </s-select>
+              <div style={{ fontSize: "0.9em", marginTop: 4, color: l.code === null ? "#8e1f0b" : "#6d7175" }}>
                 {l.code === null
                   ? t("settings.languages.unmapped")
                   : t("settings.languages.sentAs", { code: l.code })}
                 {l.noPoliteness && ` ${t("settings.languages.noPoliteness")}`}
               </div>
+              {!l.primary && (
+                <div style={{ marginTop: 8 }}>
+                  <label style={{ display: "flex", gap: 8, alignItems: "flex-start", fontWeight: 600 }}>
+                    <input
+                      type="checkbox"
+                      name={`review:${l.locale}`}
+                      defaultChecked={l.review}
+                      disabled={data.reviewOffOnServer}
+                    />
+                    {t("settings.languages.review")}
+                  </label>
+                  <div style={{ fontSize: "0.9em", marginTop: 4, color: "#6d7175" }}>
+                    {t("settings.languages.reviewHelp")}
+                    {data.reviewOffOnServer && ` ${t("settings.languages.reviewOffOnServer")}`}
+                  </div>
+                </div>
+              )}
             </div>
           ))}
         </s-section>

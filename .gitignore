@@ -30,5 +30,8 @@ pnpm-lock.yaml
 .react-router/
 
 
+# Docs movies: tooling, voice model and output (see docs/DEVELOPER.md → Demo movie)
+/test/docs/package-lock.json
+/test/docs/movie/out/
 # End-to-end test results (test/e2e)
 /test/e2e/artifacts/

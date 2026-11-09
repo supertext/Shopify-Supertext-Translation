@@ -1,0 +1,55 @@
+{
+  "shop": {
+    "locales": [
+      { "locale": "en", "name": "English", "primary": true, "published": true },
+      { "locale": "de", "name": "German", "primary": false, "published": true },
+      { "locale": "fr", "name": "French", "primary": false, "published": false }
+    ],
+    "products": [
+      {
+        "id": "gid://shopify/Product/8123456789",
+        "content": {
+          "title": ["SINGLE_LINE_TEXT_FIELD", "Linen apron"],
+          "body_html": ["HTML", "<p>Our <strong>linen apron</strong> is woven in Portugal and gets softer with every wash. Two deep pockets keep your tools at hand.</p>"],
+          "handle": ["URI", "linen-apron"],
+          "product_type": ["SINGLE_LINE_TEXT_FIELD", "Kitchen"],
+          "meta_description": ["MULTI_LINE_TEXT_FIELD", "A soft linen apron with two deep pockets, woven in Portugal."]
+        }
+      },
+      {
+        "id": "gid://shopify/Product/8123456790",
+        "content": {
+          "title": ["SINGLE_LINE_TEXT_FIELD", "Stoneware mug"],
+          "body_html": ["HTML", "<p>Hand-glazed stoneware that keeps your coffee warm.</p>"],
+          "handle": ["URI", "stoneware-mug"]
+        }
+      },
+      {
+        "id": "gid://shopify/Product/8123456791",
+        "content": {
+          "title": ["SINGLE_LINE_TEXT_FIELD", "Wool throw"],
+          "body_html": ["HTML", "<p>A warm throw made from Swiss mountain wool.</p>"],
+          "handle": ["URI", "wool-throw"]
+        }
+      }
+    ]
+  },
+  "translations": {
+    "de": {
+      "Linen apron": "Leinenschürze",
+      "<p>Our <strong>linen apron</strong> is woven in Portugal and gets softer with every wash. Two deep pockets keep your tools at hand.</p>": "<p>Unsere <strong>Leinenschürze</strong> wird in Portugal gewebt und wird mit jeder Wäsche weicher. In zwei tiefen Taschen haben Sie Ihre Werkzeuge immer griffbereit.</p>",
+      "Kitchen": "Küche",
+      "A soft linen apron with two deep pockets, woven in Portugal.": "Eine weiche Leinenschürze mit zwei tiefen Taschen, in Portugal gewebt.",
+      "Stoneware mug": "Steinzeugbecher",
+      "<p>Hand-glazed stoneware that keeps your coffee warm.</p>": "<p>Handglasiertes Steinzeug, das Ihren Kaffee warm hält.</p>",
+      "Wool throw": "Wolldecke",
+      "<p>A warm throw made from Swiss mountain wool.</p>": "<p>Eine warme Decke aus Schweizer Bergwolle.</p>"
+    },
+    "fr": {
+      "Linen apron": "Tablier en lin",
+      "<p>Our <strong>linen apron</strong> is woven in Portugal and gets softer with every wash. Two deep pockets keep your tools at hand.</p>": "<p>Notre <strong>tablier en lin</strong> est tissé au Portugal et devient plus doux à chaque lavage. Deux poches profondes gardent vos outils à portée de main.</p>",
+      "Kitchen": "Cuisine",
+      "A soft linen apron with two deep pockets, woven in Portugal.": "Un tablier en lin doux avec deux poches profondes, tissé au Portugal."
+    }
+  }
+}

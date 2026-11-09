@@ -1,9 +1,12 @@
-import type { LoaderFunctionArgs } from "react-router";
+import type { LinksFunction, LoaderFunctionArgs } from "react-router";
 import { redirect, Form, useLoaderData } from "react-router";
 
 import { localeFromRequest, translator } from "../../i18n";
+import { PublicPage, publicLinks } from "../../components/PublicPage";
 
 import styles from "./styles.module.css";
+
+export const links: LinksFunction = publicLinks;
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const url = new URL(request.url);
@@ -22,7 +25,7 @@ export default function App() {
   const { t } = translator(locale);
 
   return (
-    <div className={styles.index}>
+    <PublicPage>
       <div className={styles.content}>
         <h1 className={styles.heading}>{t("landing.heading")}</h1>
         <p className={styles.text}>{t("landing.intro")}</p>
@@ -30,10 +33,10 @@ export default function App() {
           <Form className={styles.form} method="post" action="/auth/login">
             <label className={styles.label}>
               <span>{t("login.shopDomain")}</span>
-              <input className={styles.input} type="text" name="shop" />
-              <span>{t("login.example")}</span>
+              <input className="st-input" type="text" name="shop" />
+              <span className="st-help">{t("login.example")}</span>
             </label>
-            <button className={styles.button} type="submit">
+            <button className="st-button" type="submit">
               {t("login.submit")}
             </button>
           </Form>
@@ -47,6 +50,6 @@ export default function App() {
           ))}
         </ul>
       </div>
-    </div>
+    </PublicPage>
   );
 }

@@ -1,10 +1,14 @@
-import type { MetaFunction } from "react-router";
+import type { LinksFunction, MetaFunction } from "react-router";
+
+import { PublicPage, publicLinks } from "../components/PublicPage";
 
 /**
  * Public privacy policy of the Shopify app (linked from the App Store
  * listing). Keep it in step with what the code actually stores and sends;
  * see docs/APP_STORE.md. Draft: to be reviewed by Supertext before submission.
  */
+
+export const links: LinksFunction = publicLinks;
 
 export const meta: MetaFunction = () => [
   { title: "Privacy policy – Supertext Translation for Shopify" },
@@ -14,9 +18,9 @@ const UPDATED = "9 October 2026";
 
 export default function Privacy() {
   return (
-    <main style={page}>
+    <PublicPage narrow>
       <h1>Privacy policy: Supertext Translation for Shopify</h1>
-      <p style={{ color: "#6d7175" }}>Last updated {UPDATED}</p>
+      <p className="st-muted">Last updated {UPDATED}</p>
 
       <p>
         This policy explains what the Shopify app <strong>Supertext Translation</strong>{" "}
@@ -92,14 +96,6 @@ export default function Privacy() {
         <a href="mailto:hello@supertext.com">hello@supertext.com</a> or{" "}
         <a href="https://www.supertext.com/en/contact">supertext.com/en/contact</a>.
       </p>
-    </main>
+    </PublicPage>
   );
 }
-
-const page = {
-  maxWidth: 720,
-  margin: "40px auto",
-  padding: "0 16px",
-  font: "16px/1.55 Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-  color: "#303030",
-} as const;

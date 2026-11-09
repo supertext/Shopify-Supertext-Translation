@@ -68,6 +68,8 @@ The demo shop is a Shopify development store, so the CMS-style `DEMO_*` accounts
 
 The user guide and installation guide include screenshots of the real UI, taken from the demo store by a committed script against a stand-in API that returns real translations, stored in `docs/images/`, small, with alt text, and regenerated whenever the UI they show changes. No secrets, no customer data, no local URLs.
 
+Demo movie: `npm run docs:movie` (`test/docs/movie.mjs`, the app's own pages against the stand-ins in `test/docs/stand-in.mjs`, kit in `test/docs/movie/`) records `docs/images/demo.gif` (shown in the README) and an MP4 that isn't committed; `npm run docs:movie:install` (`test/docs/movie-install.mjs`) records the install and configuration movie (MP4 only). Both need `npm run build` and an empty `DATABASE_URL`; see `docs/DEVELOPER.md` → *Demo movie*.
+
 ## Shared Supertext protocol
 
 AI file translation API v1, same as the WordPress plugin: POST HTML file → poll status → GET translation → DELETE. Details in `docs/DEVELOPER.md`.
@@ -76,8 +78,10 @@ All Supertext calls go through the **Supertext SDK** (TypeScript), bundled uncha
 
 - **Auth header:** `Authorization: Supertext-Auth-Key <key>`. Strip a pasted `Supertext-Auth-Key ` prefix and always send exactly one.
 - **Rate limit:** HTTP 429 `RATE_LIMIT_EXCEEDED`; retry up to 4 times (`Retry-After`, else 1/2/4/8 s with jitter). Translate languages one after the other.
-- **Languages:** only the codes Supertext's `GET features` lists (the SDK's `Languages`, `vendor/supertext-sdk/v1`): bare sources (`en`); targets regional only for de/en/fr/it/pt (`de-CH`, `en-US`), `zh-Hans`/`zh-Hant`, `sr-Latn`/`sr-Cyrl`, `gsw-u-sd-chzh`/`chbe`, bare for the rest (`es`, `nl`, `sl`). **No guessing:** the shop's mapping (Settings → Languages, `ShopSettings.languageCodes`), else an exact match, else the error `unsupported_language` (nothing sent). No default regions; formal/informal only where `Languages.supportsPoliteness()`. See `docs/DEVELOPER.md` → *Language codes*.
+- **Languages:** only the codes Supertext's `GET features` lists (the SDK's `Languages`, `vendor/supertext-sdk/v1`): bare sources (`en`); targets regional only for de/en/fr/it/pt (`de-CH`, `en-US`), `zh-Hans`/`zh-Hant`, `sr-Latn`/`sr-Cyrl`, `gsw-u-sd-chzh`/`chbe`, bare for the rest (`es`, `nl`, `sl`). **Defaults only where obvious:** the shop's mapping (Settings → Languages, a Polaris select per shop language with the SDK's `targetOptions()`, preselected with `suggestTarget`; `ShopSettings.languageCodes`), else an exact match, else the SDK default (de→de-DE, en→en-US, fr→fr-FR, it→it-IT, pt→pt-PT, zh-CN→zh-Hans, zh-TW→zh-Hant, es-ES→es, …), else the error `unsupported_language` (nothing sent; en-IE, de-LI, gsw, … need a mapping); formal/informal only where `Languages.supportsPoliteness()`. See `docs/DEVELOPER.md` → *Language codes*.
 - **Rich text:** each element carrying `data-st-id` is translated on its own. Send a whole field (or paragraph) as **one** `data-st-id` element with formatting and links as inline tags; never one per formatted run.
+
+**Translation review:** a checkbox per target language on Settings → Languages (`ShopSettings.reviewLocales`); those languages are translated through the review service (`SUPERTEXT_REVIEW_URL`, default `REVIEW_URL` in `app/supertext/client.server.ts`, `createClients().forReview()`); key check, reports and translation files never use it. See `docs/DEVELOPER.md` → *Supertext API protocol*.
 
 **Commando Center:** version reports and the automatic API key check go through Plugin Health's `InstallationReporter` with the SDK's `checkApiKey()` (`app/reporting/reporting.ts`, wired in `app/reporting/index.server.ts`, state per shop in `ShopSettings.reporterState`; setting `versionReports`, `SUPERTEXT_VERSION_REPORTS=0` turns it off). Hosted app: site URL = the shop's myshopify.com address, no ping, no callback. See `docs/DEVELOPER.md` → *Commando Center*. Reporting must never break a save, a page or a translation; tests never reach the live center (`SUPERTEXT_REPORT_URL`).
 

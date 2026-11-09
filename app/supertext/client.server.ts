@@ -8,6 +8,7 @@
  * list and the API key check.
  */
 import {
+  LIVE_BASE_URL,
   SupertextClient,
   SupertextError,
   type Politeness,
@@ -38,6 +39,49 @@ export function createClient(options: ClientOptions): SupertextClient {
     ...(options.sleep ? { sleep: options.sleep } : {}),
     ...(options.pollIntervalMs !== undefined ? { pollIntervalMs: options.pollIntervalMs } : {}),
   });
+}
+
+/**
+ * Supertext's review service (the translation proxy of Supertext Localization
+ * Review). It speaks the same API v1 and forwards to the live Supertext API
+ * with the shop's key, keeping every translation so reviewers can correct
+ * them on the storefront. Used for languages with *Translation review* on.
+ */
+export const REVIEW_URL = "https://localizationreview-production.up.railway.app/v1/";
+
+/**
+ * The review service's address: SUPERTEXT_REVIEW_URL if set (an empty value
+ * turns review off for every shop and language), else REVIEW_URL.
+ */
+export const reviewUrl = (env: NodeJS.ProcessEnv = process.env): string =>
+  env.SUPERTEXT_REVIEW_URL !== undefined ? env.SUPERTEXT_REVIEW_URL.trim() : REVIEW_URL;
+
+export interface Clients {
+  /** The direct client (live API or SUPERTEXT_API_ENDPOINT). */
+  readonly direct: SupertextClient;
+  /**
+   * The client for a target language: the review service when its
+   * *Translation review* is on (same key, User-Agent and settings, created on
+   * first use), else the direct one. Without a review URL, always the direct one.
+   */
+  forReview(review: boolean): SupertextClient;
+}
+
+const sameUrl = (a: string, b: string) => a.replace(/\/+$/, "") === b.replace(/\/+$/, "");
+
+export function createClients(options: ClientOptions & { reviewUrl?: string }): Clients {
+  const { reviewUrl: review = "", ...rest } = options;
+  const direct = createClient(rest);
+  const url = review.trim();
+  const off = url === "" || sameUrl(url, options.baseUrl || LIVE_BASE_URL);
+  let reviewClient: SupertextClient | null = null;
+  return {
+    direct,
+    forReview(on: boolean) {
+      if (!on || off) return direct;
+      return (reviewClient ??= createClient({ ...rest, baseUrl: url }));
+    },
+  };
 }
 
 const AUTH_HINT =

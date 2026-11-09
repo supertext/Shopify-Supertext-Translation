@@ -1,4 +1,8 @@
-import type { HeadersFunction, LoaderFunctionArgs } from "react-router";
+import type {
+  HeadersFunction,
+  LinksFunction,
+  LoaderFunctionArgs,
+} from "react-router";
 import { Outlet, useLoaderData, useRouteError } from "react-router";
 import { boundary } from "@shopify/shopify-app-react-router/server";
 import { AppProvider } from "@shopify/shopify-app-react-router/react";
@@ -6,6 +10,16 @@ import { AppProvider } from "@shopify/shopify-app-react-router/react";
 import { authenticate } from "../shopify.server";
 import { localeFromRequest } from "../i18n";
 import { I18nProvider, useI18n } from "../i18n/react";
+
+// Shopify's Inter for the embedded admin pages (Polaris look). The public
+// pages bundle their own Inter instead (app/components/PublicPage.tsx).
+export const links: LinksFunction = () => [
+  { rel: "preconnect", href: "https://cdn.shopify.com/" },
+  {
+    rel: "stylesheet",
+    href: "https://cdn.shopify.com/static/fonts/inter/v4/styles.css",
+  },
+];
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   await authenticate.admin(request);

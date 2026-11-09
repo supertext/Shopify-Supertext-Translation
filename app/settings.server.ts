@@ -1,5 +1,5 @@
 import prisma from "./db.server";
-import { createClient, type Politeness, type SupertextClient } from "./supertext/client.server";
+import { createClients, reviewUrl, type Clients, type Politeness } from "./supertext/client.server";
 import { appVersion } from "./version.server";
 import {
   decryptSecret,
@@ -13,6 +13,8 @@ export interface Settings {
   politeness: Politeness;
   /** Shopify locale → Supertext code set by the shop (one mapping for targets and the source). */
   languageCodes: Record<string, string>;
+  /** Shopify locales with *Translation review* on: translations into them go through the review service. */
+  reviewLocales: string[];
   /** "Send version information to Supertext" as saved (the environment can still turn it off). */
   versionReports: boolean;
   /** A key is stored but can't be decrypted (the server's encryption key changed). */
@@ -47,6 +49,7 @@ export async function getSettings(shop: string): Promise<Settings> {
     apiKey,
     politeness: toPoliteness(row?.politeness),
     languageCodes: parseCodes(row?.languageCodes),
+    reviewLocales: parseLocales(row?.reviewLocales),
     versionReports: row?.versionReports ?? true,
     apiKeyUnreadable,
   };
@@ -64,6 +67,15 @@ function parseCodes(json: string | undefined): Record<string, string> {
   }
 }
 
+function parseLocales(json: string | undefined): string[] {
+  try {
+    const value = JSON.parse(json || "[]");
+    return Array.isArray(value) ? value.filter((v): v is string => typeof v === "string") : [];
+  } catch {
+    return [];
+  }
+}
+
 /**
  * An empty `apiKey` keeps the saved key (the field never shows it). A new key
  * is stored encrypted; throws EncryptionKeyMissing if the server can't encrypt.
@@ -74,6 +86,7 @@ export async function saveSettings(
     apiKey?: string;
     politeness: Politeness;
     languageCodes?: Record<string, string>;
+    reviewLocales?: string[];
     versionReports?: boolean;
   },
 ): Promise<void> {
@@ -81,6 +94,8 @@ export async function saveSettings(
   const apiKey = plainKey ? encryptSecret(plainKey) : undefined;
   const languageCodes =
     input.languageCodes !== undefined ? JSON.stringify(input.languageCodes) : undefined;
+  const reviewLocales =
+    input.reviewLocales !== undefined ? JSON.stringify([...new Set(input.reviewLocales)].sort()) : undefined;
   await prisma.shopSettings.upsert({
     where: { shop },
     create: {
@@ -88,6 +103,7 @@ export async function saveSettings(
       apiKey: apiKey ?? "",
       politeness: input.politeness,
       languageCodes: languageCodes ?? "{}",
+      reviewLocales: reviewLocales ?? "[]",
       versionReports: input.versionReports ?? true,
     },
     update: {
@@ -95,6 +111,7 @@ export async function saveSettings(
       politeness: input.politeness,
       ...(apiKey ? { apiKey } : {}),
       ...(languageCodes !== undefined ? { languageCodes } : {}),
+      ...(reviewLocales !== undefined ? { reviewLocales } : {}),
     },
   });
 }
@@ -107,10 +124,16 @@ export async function removeApiKey(shop: string): Promise<void> {
 export const effectiveApiKey = (settings: Settings): string =>
   settings.apiKey || process.env.SUPERTEXT_API_KEY?.trim() || "";
 
-export const supertextClient = (settings: Settings): SupertextClient =>
-  createClient({
+/**
+ * The shop's Supertext clients: `direct` (the live API, or SUPERTEXT_API_ENDPOINT
+ * for tests and screenshots) and, for languages with *Translation review* on,
+ * the review service (SUPERTEXT_REVIEW_URL, default Supertext's), same key and
+ * User-Agent. Only translations use the review service.
+ */
+export const supertextClients = (settings: Settings): Clients =>
+  createClients({
     apiKey: effectiveApiKey(settings),
-    // A stand-in API for tests and screenshots; the live API otherwise.
     baseUrl: process.env.SUPERTEXT_API_ENDPOINT || undefined,
     userAgent: `Shopify-Supertext-Translation/${appVersion() ?? "dev"}`,
+    reviewUrl: reviewUrl(),
   });
