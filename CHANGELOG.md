@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Changed: the app now runs on React 19 (was React 18). No change for merchants.
 - Docs: a demo movie at the top of the README (`docs/images/demo.gif`), and narrated demo and install movies recorded from the app's own pages against stand-ins (`npm run docs:movie`, `npm run docs:movie:install`; see the developer guide).
 - Added: the Supertext support form is linked in the README, the user guide and GitHub's "New issue" page.
 - **Added: Translation review** per language (Settings → Languages, a checkbox below each target language's combo box, off by default): translations into a language with *Translation review* ticked go through Supertext's review service (Supertext Localization Review), where your colleagues and Supertext linguists correct them on the online store with a Chrome extension; corrections come back into Shopify with the next translation (with *Overwrite existing translations*), and texts translated before keep their (reviewed) wording. Same API key, billing, languages and messages; other languages keep going directly to Supertext. Server variable `SUPERTEXT_REVIEW_URL` (defaults to Supertext's review service; empty turns review off for every shop). Database migration `20261019000000_translation_review`. All four interface languages.

@@ -253,7 +253,7 @@ React Router majors are ignored too (`react-router` and all `@react-router/*`): 
 
 Prisma majors (`prisma`, `@prisma/client`) wait for `@shopify/shopify-app-session-storage-prisma`, whose 11.x releases require Prisma ^6. `@typescript-eslint/parser` and `@typescript-eslint/eslint-plugin` must always have the same version; Dependabot proposes their majors one at a time, which can't pass, so those majors are ignored and done by hand for both at once.
 
-React 19 (`react`, `react-dom` and their types): `@shopify/app-bridge-react` 4.x now accepts any React version, but with React 19's types the app's `<s-app-nav>` element no longer type-checks (`Property 's-app-nav' does not exist on type 'JSX.IntrinsicElements'`, in `app/routes/app.tsx`): the declaration of the `s-*` elements has to move to React 19's `React.JSX` namespace first, then lift the rule. ESLint 10 no longer reads `.eslintrc.cjs`: moving to a flat `eslint.config.js` comes first (see *Known limitations / roadmap*), then lift the `eslint` rule.
+The app runs on React 19. `@shopify/app-bridge-types` still declares its elements (`<s-app-nav>`, `<ui-modal>`, …) in the global `JSX` namespace, which React 19's types no longer read; `env.d.ts` copies them into `React.JSX`. Remove that block once app-bridge-types declares them there itself. ESLint 10 no longer reads `.eslintrc.cjs`: moving to a flat `eslint.config.js` comes first (see *Known limitations / roadmap*), then lift the `eslint` rule.
 
 ## Code quality and security checks
 

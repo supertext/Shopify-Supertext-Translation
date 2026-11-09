@@ -25,15 +25,6 @@ updates:
       # @typescript-eslint/parser and /eslint-plugin must share one version: update both by hand
       - dependency-name: "@typescript-eslint/*"
         update-types: ["version-update:semver-major"]
-      # React 19 moves JSX into the react module: app-bridge's s-* element types (s-app-nav) need updating first
-      - dependency-name: "react"
-        update-types: ["version-update:semver-major"]
-      - dependency-name: "react-dom"
-        update-types: ["version-update:semver-major"]
-      - dependency-name: "@types/react"
-        update-types: ["version-update:semver-major"]
-      - dependency-name: "@types/react-dom"
-        update-types: ["version-update:semver-major"]
       # ESLint 10 drops .eslintrc: migrate to eslint.config.js first
       - dependency-name: "eslint"
         update-types: ["version-update:semver-major"]
