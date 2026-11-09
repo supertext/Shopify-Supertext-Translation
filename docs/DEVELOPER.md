@@ -158,7 +158,7 @@ Protocol: [Commando-Center-Supertext-Translation](https://github.com/Supertext/C
 
 ## Local development
 
-Requirements: Node.js 22.12+ (CI runs the tests on Node 22, 24 and 26; the Docker image uses Node 22), a PostgreSQL database, the [Shopify CLI](https://shopify.dev/docs/apps/tools/cli) and access to the app in the Dev Dashboard.
+Requirements: Node.js 22.18+ (`graphql-config` 6, used by `npm run graphql-codegen`, needs it) (CI runs the tests on Node 22, 24 and 26; the Docker image uses Node 22), a PostgreSQL database, the [Shopify CLI](https://shopify.dev/docs/apps/tools/cli) and access to the app in the Dev Dashboard.
 
 ```bash
 npm install
@@ -249,7 +249,7 @@ Dependabot (`.github/dependabot.yml`) opens weekly pull requests: minor and patc
 
 Some major versions are ignored on purpose: TypeScript (7.x is the native compiler, which the type-checking and build tools here don't support yet) and `@types/node` (the types must match the oldest Node version the plugin supports, not the newest). Lift an ignore rule when the plugin moves to the new version.
 
-React Router majors are ignored too (`react-router` and all `@react-router/*`): the whole family has to move together with `@shopify/shopify-app-react-router`, whose 3.x releases still require `react-router` ^7, and React Router 8 needs Node 22.22 or later while the app supports 22.12. Lift the rule once a Shopify release supports React Router 8, then update all of them (and `engines.node`, if needed) in one change.
+React Router majors are ignored too (`react-router` and all `@react-router/*`): the whole family has to move together with `@shopify/shopify-app-react-router`, whose 3.x releases still require `react-router` ^7, and React Router 8 needs Node 22.22 or later while the app supports 22.18. Lift the rule once a Shopify release supports React Router 8, then update all of them (and `engines.node`, if needed) in one change.
 
 Prisma majors (`prisma`, `@prisma/client`) wait for `@shopify/shopify-app-session-storage-prisma`, whose 11.x releases require Prisma ^6. `@typescript-eslint/parser` and `@typescript-eslint/eslint-plugin` must always have the same version; Dependabot proposes their majors one at a time, which can't pass, so those majors are ignored and done by hand for both at once.
 

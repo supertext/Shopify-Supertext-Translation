@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Changed: building and running the app needs Node.js 22.18 or later (was 22.12): `graphql-config` 6 requires it. The Docker image already uses the latest Node 22.
 - Changed: the pages inside the Shopify admin use Shopify's Polaris web components 2.x (`@shopify/shopify-app-react-router` 4), so they follow the admin's new look.
 - Changed: the app now runs on React 19 (was React 18). No change for merchants.
 - Docs: a demo movie at the top of the README (`docs/images/demo.gif`), and narrated demo and install movies recorded from the app's own pages against stand-ins (`npm run docs:movie`, `npm run docs:movie:install`; see the developer guide).

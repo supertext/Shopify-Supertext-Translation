@@ -12,7 +12,7 @@ updates:
       - dependency-name: "@types/node"  # types must match the oldest supported Node version, not the newest
         update-types: ["version-update:semver-major"]
       # React Router moves as one family; @shopify/shopify-app-react-router 3.x
-      # peers react-router ^7, and RR 8 needs Node >=22.22 (we promise >=22.12)
+      # peers react-router ^7, and RR 8 needs Node >=22.22 (we promise >=22.18)
       - dependency-name: "react-router"
         update-types: ["version-update:semver-major"]
       - dependency-name: "@react-router/*"
