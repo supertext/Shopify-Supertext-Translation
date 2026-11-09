@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Changed: the pages inside the Shopify admin use Shopify's Polaris web components 2.x (`@shopify/shopify-app-react-router` 4), so they follow the admin's new look.
 - Changed: the app now runs on React 19 (was React 18). No change for merchants.
 - Docs: a demo movie at the top of the README (`docs/images/demo.gif`), and narrated demo and install movies recorded from the app's own pages against stand-ins (`npm run docs:movie`, `npm run docs:movie:install`; see the developer guide).
 - Added: the Supertext support form is linked in the README, the user guide and GitHub's "New issue" page.

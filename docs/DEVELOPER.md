@@ -64,7 +64,7 @@ The app's UI is in English, German, French and Italian and follows the merchant'
 
 Two looks, on purpose:
 
-- **Embedded admin pages** (`app/routes/app.*`, shown inside the Shopify admin): Shopify's Polaris web components and Shopify's Inter, as Shopify's app design guidelines expect. Don't restyle them.
+- **Embedded admin pages** (`app/routes/app.*`, shown inside the Shopify admin): Shopify's Polaris web components (2.x, loaded from `polaris-2.js` by `@shopify/shopify-app-react-router` 4; types from `@shopify/polaris-types` 2) and Shopify's Inter, as Shopify's app design guidelines expect. Don't restyle them.
 - **Public pages outside the admin** (the landing page `_index/`, the login page `auth.login/`, the privacy policy `privacy.tsx`): Supertext's look, as on supertext.com and in the other hosted Supertext apps. The deep-green header bar (`#003230`, rounded bottom corners) with Supertext's mint logo (`public/supertext-logo.svg`, the website's own SVG), the warm off-white background (`#f7f5f3`), deep-green text and outlines, mint (`#78ffaf`) for the main action, light grey lines (`#dfe1df`), pill-shaped buttons. They use `PublicPage` and its `publicLinks` (`app/components/PublicPage.tsx`), which load `app/styles/public.css`; the colours are CSS variables at the top of that file. Text is set in Inter, bundled in `public/fonts/` (variable font, Latin and Latin Extended; SIL Open Font License in `Inter-LICENSE.txt`), so these pages load no font from elsewhere. Supertext's heading font (ABC Ginto Nord) is licensed and not bundled; headings use Inter Bold.
 
 The favicon (`public/favicon.svg`, with `favicon.ico` for older browsers) is the logo's S mark on deep green.
