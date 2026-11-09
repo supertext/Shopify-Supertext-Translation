@@ -49,6 +49,7 @@ scripts/vendor-sdk.sh       updates the bundled SDK
 scripts/vendor-plugin-health.sh  updates the bundled Plugin Health
 test/                       Vitest unit tests with fake Shopify and fake Supertext
 test/docs/                  the docs movies: scripts, stand-ins for Shopify and Supertext, the movie kit (see *Demo movie*)
+test/e2e/                   end-to-end test against the real Supertext API (stand-in Shopify); see *End-to-end tests*
 shopify.app.toml            app configuration: client ID, URLs, scopes, webhooks
 ```
 
@@ -178,6 +179,35 @@ npm run build
 ```
 
 The tests use a fake Admin API client and the real bundled SDK talking to an in-memory Supertext API (`test/fake-supertext.ts`), so they need neither a store, a database nor the network. To try the app against the SDK repo's stand-in API (which enforces the live API's rules): `node stand-in/stand-in.mjs` in the SDK repo and `SUPERTEXT_API_ENDPOINT=http://127.0.0.1:8765/v1/`.
+
+CI: `.github/workflows/ci.yml` runs `npm ci`, the type check, the unit tests and the build on every push and pull request; `checks.yml` and `links.yml` lint the workflows and check the links (see *Code quality and security checks*); `e2e.yml` runs the end-to-end test against the real Supertext API (see *End-to-end tests*).
+
+## End-to-end tests
+
+The unit tests use fakes. `.github/workflows/e2e.yml` also tests against the **real Supertext API**, so changes on Supertext's side (language codes, regional variants, formatting, rate limits) show up. It runs on every push to `main` that touches `app/`, `vendor/`, `prisma/`, the packages or the tests, on pull requests that change the E2E test or workflow, every Monday (06:13 UTC) and by hand (*Actions → E2E → Run workflow*). The key is only the repository secret `SUPERTEXT_API_KEY` (set by Remy); without it the workflow skips the tests with a warning.
+
+**Why Shopify is a stand-in.** The app runs inside the Shopify admin: every request carries a session token signed by Shopify, and the job talks to `https://<shop>.myshopify.com/admin/api/…` with the shop's offline token. A development store can't be created, seeded or logged into from CI (Shopify's login has 2FA and bot protection), so the test replaces only Shopify and runs everything else for real:
+
+- `test/e2e/shopify-stand-in.ts` (test-only) answers the app's Admin GraphQL calls (`shopLocales`, `translatableResources`, `translatableResource`, `translationsRegister`) from a sample shop: English primary, German (published) and French (not published); two products, a collection, a page, a blog post and a blog, with bold, italics, lists, headings, internal, external and `mailto:` links and a multi-line SEO description. Like Shopify, `translationsRegister` refuses unknown keys, the primary locale, locales the shop doesn't have and a digest that doesn't match the source text, and keeps one translation per key and locale. Shopify doesn't run Liquid in these fields, so there are no placeholders to keep.
+- `test/e2e/live.e2e.ts` (Vitest, `test/e2e/vitest.config.ts`) mocks `app/shopify.server.ts` so that `authenticate.admin` and `unauthenticated.admin` return the stand-in, then works like a merchant on the Translate page: it saves the demo's language mapping (Settings → Languages: `de` → `de-CH`, `fr` → `fr-CH`; the API key comes from `SUPERTEXT_API_KEY`, like the demo store's), calls the page's **own loader and action** (`app/routes/app._index.tsx`) for every list (products, collections, pages, blog posts, blogs) with all items and both languages, and waits for each job, which runs in `jobs.server.ts` with a real PostgreSQL database and the bundled SDK against the live API.
+
+What it checks (`ok` / `FAIL` / `note` lines; any `FAIL` fails the run):
+
+- the page shows both languages mapped, an API key and every sample item; each job finishes without errors and the page lists it as done, with no error message; the app sends Shopify nothing but the four operations above;
+- every field the app translates is registered for every language, with the current digest, and no translation for fields it skips (handles); at least 80 % of the fields changed (single words like a product type may stay the same; unchanged ones are `note`s);
+- no `data-st-id`, `data-st-ph`, `st-ph-` or document markup left; in HTML fields paragraphs, headings, lists, bold, italics and links are kept (counted) with the same link targets; plain-text fields get no markup and keep their line breaks;
+- the text is in the target language (common words of each language counted) and `de-CH` has no "ß";
+- translating again without *Overwrite* writes nothing and sends nothing to Supertext; with *Overwrite* the same fields are registered again in place (no extra keys).
+
+`test/e2e/features.mjs` (no app or SDK code) first asks the live `GET features` (cost-free) whether the pairs the demo translates (`en` → `de-CH`, `fr-CH`) are offered. Each run translates the sample shop into two languages plus one product again (around 6,000 characters on the key's account). Not covered: the embedded UI in the browser (App Bridge, Polaris web components), Shopify's OAuth and session tokens, webhooks and the real Admin API's limits; and there are no docs screenshots yet (no screenshot script; see *Known limitations / roadmap*).
+
+If a run fails, the artifact `e2e-debug` has `result.json`: the jobs, every translation the stand-in received, all Admin API requests and the failed checks. Locally (a migrated PostgreSQL database; version reports are off in the test config):
+
+```bash
+SUPERTEXT_API_KEY=… E2E_TARGETS=de-CH,fr-CH node test/e2e/features.mjs
+DATABASE_URL=postgresql://… npx prisma migrate deploy
+DATABASE_URL=postgresql://… SUPERTEXT_API_KEY=… npm run test:e2e
+```
 
 ## Hosting (Railway)
 

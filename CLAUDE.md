@@ -86,6 +86,10 @@ All Supertext calls go through the **Supertext SDK** (TypeScript), bundled uncha
 
 **Commando Center:** version reports and the automatic API key check go through Plugin Health's `InstallationReporter` with the SDK's `checkApiKey()` (`app/reporting/reporting.ts`, wired in `app/reporting/index.server.ts`, state per shop in `ShopSettings.reporterState`; setting `versionReports`, `SUPERTEXT_VERSION_REPORTS=0` turns it off). Hosted app: site URL = the shop's myshopify.com address, no ping, no callback. See `docs/DEVELOPER.md` → *Commando Center*. Reporting must never break a save, a page or a translation; tests never reach the live center (`SUPERTEXT_REPORT_URL`).
 
+## This repo
+
+- End-to-end tests against the real Supertext API: `.github/workflows/e2e.yml` with `test/e2e/` (see "End-to-end tests" in `docs/DEVELOPER.md`): the Translate page's loader/action, the job runner, PostgreSQL and the SDK run for real, Shopify is the stand-in `test/e2e/shopify-stand-in.ts`. The key is only the GitHub secret `SUPERTEXT_API_KEY`, set by Remy; sessions don't use a live key. Behaviour changes need matching checks in `test/e2e/live.e2e.ts` (and the stand-in, if the app sends Shopify something new).
+
 ## Railway lessons
 
 - Railway builds from a `git archive` snapshot: never `export-ignore` anything the Dockerfile copies.

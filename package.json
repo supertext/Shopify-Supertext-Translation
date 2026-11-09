@@ -19,6 +19,7 @@
     "vite": "vite",
     "typecheck": "react-router typegen && tsc --noEmit",
     "test": "vitest run",
+    "test:e2e": "vitest run --config test/e2e/vitest.config.ts",
     "docs:movie": "npm --prefix test/docs install --no-audit --no-fund --no-package-lock && node test/docs/movie.mjs",
     "docs:movie:install": "npm --prefix test/docs install --no-audit --no-fund --no-package-lock && node test/docs/movie-install.mjs"
   },
