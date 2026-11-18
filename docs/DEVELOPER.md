@@ -159,7 +159,7 @@ Protocol: [Commando-Center-Supertext-Translation](https://github.com/Supertext/C
 
 ## Local development
 
-Requirements: Node.js 22.18+ (`graphql-config` 6, used by `npm run graphql-codegen`, needs it) (CI runs the tests on Node 22, 24 and 26; the Docker image uses Node 22), a PostgreSQL database, the [Shopify CLI](https://shopify.dev/docs/apps/tools/cli) and access to the app in the Dev Dashboard.
+Requirements: Node.js 22.18+ (`graphql-config` 6, used by `npm run graphql-codegen`, needs it) (CI runs the tests on Node 22, 24 and 26; the Docker image uses Node 26), a PostgreSQL database, the [Shopify CLI](https://shopify.dev/docs/apps/tools/cli) and access to the app in the Dev Dashboard.
 
 ```bash
 npm install

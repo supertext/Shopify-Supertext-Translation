@@ -1,5 +1,5 @@
 # Supertext Translation for Shopify: the app backend (runs on Railway).
-FROM node:22-alpine
+FROM node:26-alpine
 RUN apk add --no-cache openssl
 
 WORKDIR /app
