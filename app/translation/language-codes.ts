@@ -69,14 +69,15 @@ export const politenessFor = <P extends string>(politeness: P | "default", targe
   supportsPoliteness(targetCode) ? politeness : "default";
 
 /**
- * A target's name in the admin language ("Deutsch (Schweiz)"), from the platform's
+ * A target's name in the admin language as in Supertext's language list ("Deutsch (Schweiz)",
+ * not "Schweizer Hochdeutsch"), from the platform's
  * Intl.DisplayNames; Supertext's English name where that gives nothing better
  * (and for the Swiss German dialect codes, which it can't tell apart).
  */
 export function targetName(language: TargetLanguage, uiLocale: string): string {
   if (language.code.includes("-u-")) return language.name;
   try {
-    const name = new Intl.DisplayNames([uiLocale], { type: "language" }).of(language.code);
+    const name = new Intl.DisplayNames([uiLocale], { type: "language", languageDisplay: "standard" }).of(language.code);
     return name && name !== language.code ? name : language.name;
   } catch {
     return language.name;

@@ -54,7 +54,7 @@ The default language (shown as *Default* in Shopify) is the source language.
 
 Supertext translates into exact language variants, for example `de-CH` (Swiss Standard German, no "ß"), `de-DE`, `fr-CH`, `fr-FR`, `en-US`, `en-GB`, `pt-BR`. Shopify names most languages without a region (`de`, `fr`). Choose the variant for each language under **Apps → Supertext Translation → Settings → Languages**:
 
-1. Each of your shop's languages (the default language included) has a drop-down list (combo box) with Supertext's languages, shown as *Name (code)*, for example *Schweizer Hochdeutsch (de-CH)*; the names follow your admin language. Pick one and click **Save**.
+1. Each of your shop's languages (the default language included) has a drop-down list (combo box) with Supertext's languages, shown as *Name (code)*, for example *Deutsch (Schweiz) (de-CH)*; the names follow your admin language. Pick one and click **Save**.
 2. The list is preselected with Supertext's suggestion until you save your own choice: the same code where Supertext offers it (`es`, `nl`, `sv`, `pl`, `pt-BR`, `zh-Hans`, …), else the default below. Languages you never touch are translated with that suggestion too.
 3. Under each list the page shows what is sent: *Sent to Supertext as de-DE*, or in red *No Supertext language* for a language without suggestion (for example `en-IE`, `de-LI`, `fr-BE`, `gsw`, `sr-RS`). Choose one for it; until then it can't be ticked on the translate page and nothing is sent for it.
 4. *— choose —* removes a saved choice; the suggestion then applies again (or the language is unmapped if it has none). The server accepts only codes from Supertext's list.

@@ -96,7 +96,7 @@ export const de: Messages = {
   "settings.apiKey.placeholderServer": "Der auf dem Server hinterlegte Schlüssel wird verwendet.",
   "settings.apiKey.placeholder": "Supertext-API-Schlüssel einfügen",
   "settings.languages.heading": "Sprachen",
-  "settings.languages.text": "Wählen Sie die Supertext-Sprache für jede Sprache Ihres Shops. Jede Liste beginnt mit dem Vorschlag von Supertext: demselben Code, wo Supertext ihn anbietet (es, nl, pt-BR …), sonst der naheliegenden Vorgabe (de → Deutsch (Deutschland) de-DE, en → Englisch (Vereinigte Staaten) en-US, fr → fr-FR, it → it-IT, pt → pt-PT, zh-CN → zh-Hans, zh-TW → zh-Hant). Wählen Sie bei Bedarf eine andere, zum Beispiel de-CH für Schweizer Hochdeutsch. Eine Sprache ohne Vorschlag (etwa en-IE oder de-LI) zeigt „— auswählen —“ und kann erst übersetzt werden, wenn Sie eine wählen. Aus Ihrer Standardsprache wird übersetzt.",
+  "settings.languages.text": "Wählen Sie die Supertext-Sprache für jede Sprache Ihres Shops. Jede Liste beginnt mit dem Vorschlag von Supertext: demselben Code, wo Supertext ihn anbietet (es, nl, pt-BR …), sonst der naheliegenden Vorgabe (de → Deutsch (Deutschland) de-DE, en → Englisch (Vereinigte Staaten) en-US, fr → fr-FR, it → it-IT, pt → pt-PT, zh-CN → zh-Hans, zh-TW → zh-Hant). Wählen Sie bei Bedarf eine andere, zum Beispiel de-CH für Deutsch (Schweiz). Eine Sprache ohne Vorschlag (etwa en-IE oder de-LI) zeigt „— auswählen —“ und kann erst übersetzt werden, wenn Sie eine wählen. Aus Ihrer Standardsprache wird übersetzt.",
   "settings.languages.default": ", Standardsprache",
   "settings.style.heading": "Übersetzungsstil",
   "settings.style.label": "Anrede",
