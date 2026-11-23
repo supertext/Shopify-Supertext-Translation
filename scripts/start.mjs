@@ -1,5 +1,7 @@
 // Production start (Railway): make sure the app's own database exists on the
 // shared Postgres server, apply migrations, then start the server.
+// With --prepare it stops before the server: the Dockerfile then starts react-router-serve
+// with exec, so the server gets Railway's SIGTERM itself and exits cleanly on a redeploy.
 //
 // DATABASE_URL points at the server (any database on it); SHOPIFY_DB_NAME
 // (default "shopify_supertext") is the database this app uses there.
@@ -48,4 +50,4 @@ const interrupted = await app.query(
 );
 if (interrupted.rowCount) console.log(`[supertext] marked ${interrupted.rowCount} interrupted translation(s)`);
 await app.end();
-run("npx", ["react-router-serve", "./build/server/index.js"]);
+if (!process.argv.includes("--prepare")) run("npx", ["react-router-serve", "./build/server/index.js"]);

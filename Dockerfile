@@ -12,5 +12,7 @@ COPY . .
 RUN npx prisma generate && npm run build && npm prune --omit=dev
 
 ENV NODE_ENV=production
-# Applies database migrations, then starts the server.
-CMD ["npm", "run", "docker-start"]
+# Applies database migrations, then starts the server directly (exec, not through npm or npx):
+# on a redeploy Railway stops the old container with SIGTERM; react-router-serve closes cleanly
+# (exit 0), npm would report the signal as a failed command ("Deploy Crashed" emails).
+CMD ["sh", "-c", "node scripts/start.mjs --prepare && exec ./node_modules/.bin/react-router-serve ./build/server/index.js"]
