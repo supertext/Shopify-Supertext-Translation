@@ -15,4 +15,5 @@ ENV NODE_ENV=production
 # Applies database migrations, then starts the server directly (exec, not through npm or npx):
 # on a redeploy Railway stops the old container with SIGTERM; react-router-serve closes cleanly
 # (exit 0), npm would report the signal as a failed command ("Deploy Crashed" emails).
-CMD ["sh", "-c", "node scripts/start.mjs --prepare && exec ./node_modules/.bin/react-router-serve ./build/server/index.js"]
+# start.mjs --prepare writes the app database's URL (DATABASE_URL points at the shared server).
+CMD ["sh", "-c", "node scripts/start.mjs --prepare /tmp/database-url && DATABASE_URL=\"$(cat /tmp/database-url)\" && rm -f /tmp/database-url && export DATABASE_URL && exec ./node_modules/.bin/react-router-serve ./build/server/index.js"]
