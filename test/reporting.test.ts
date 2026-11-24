@@ -156,4 +156,22 @@ describe("Commando Center glue", () => {
     broken.onRequestInBackground(SHOP);
     await broken.idle();
   });
+
+  it("Send configuration: the language mapping in one extensions report (no plugins), nothing when off", async () => {
+    const languages = [
+      { code: "en", supertext: "en" },
+      { code: "de", supertext: "de-DE" },
+      { code: "en-IE", supertext: null },
+    ];
+    const { reporting, reports } = setup();
+    const result = await reporting.sendConfiguration(SHOP, languages);
+    expect(result).toMatchObject({ event: "extensions", sent: true });
+    expect(reports).toHaveLength(1);
+    expect(reports[0]).toMatchObject({ event: "extensions", extensions: [], languages, site_url: "https://demo-shop.myshopify.com" });
+    expect(JSON.stringify(reports[0])).not.toContain(KEY);
+
+    const off = setup({ versionReports: false });
+    expect(await off.reporting.sendConfiguration(SHOP, languages)).toBeNull();
+    expect(off.reports).toHaveLength(0);
+  });
 });

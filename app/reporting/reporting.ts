@@ -19,6 +19,7 @@ import {
   reportsEnabled,
   type KeyCheck,
   type KeyChecker,
+  type LanguageMapping,
   type ReporterOptions,
   type ReporterResult,
   type ReporterState,
@@ -56,7 +57,8 @@ type Action =
   | { kind: "afterSettingsSaved" }
   | { kind: "testConnection" }
   | { kind: "onRequest" }
-  | { kind: "authenticationFailed"; httpStatus: number };
+  | { kind: "authenticationFailed"; httpStatus: number }
+  | { kind: "sendConfiguration"; languages: LanguageMapping[] };
 
 /** The shop's address as the center identifies the installation: https://<shop>.myshopify.com. */
 export const siteUrl = (shop: string): string => `https://${shop.trim().toLowerCase()}`;
@@ -87,6 +89,15 @@ export class ShopReporting {
     return this.run(shop, { kind: "authenticationFailed", httpStatus });
   }
 
+  /**
+   * "Send configuration to Supertext" (Settings): the shop's language mapping in one `extensions`
+   * report (a hosted app has no plugins of its own to list, so the list is empty), sent now (also
+   * within the hour after a failed report). Null while version reports are off. Never throws.
+   */
+  sendConfiguration(shop: string, languages: LanguageMapping[]): Promise<ReporterResult | null> {
+    return this.run(shop, { kind: "sendConfiguration", languages });
+  }
+
   /** On the app's admin pages and after jobs: in the background, never awaited by the page. */
   onRequestInBackground(shop: string): void {
     const task = this.run(shop, { kind: "onRequest" });
@@ -108,7 +119,7 @@ export class ShopReporting {
     while (this.background.size) await Promise.all([...this.background]);
   }
 
-  reporter(enabled: boolean, shop: string): InstallationReporter {
+  reporter(enabled: boolean, shop: string, languages?: LanguageMapping[]): InstallationReporter {
     return new InstallationReporter({
       enabled,
       siteUrl: siteUrl(shop),
@@ -117,6 +128,7 @@ export class ShopReporting {
       sdkVersion: SDK_VERSION,
       callbackUrl: null,
       keyChecker: this.keyChecker(),
+      ...(languages ? { languages: () => languages } : {}),
       ...this.deps.reporterOverrides,
     });
   }
@@ -146,7 +158,9 @@ export class ShopReporting {
   private async execute(shop: string, action: Action): Promise<ReporterResult | null> {
     try {
       const settings = await this.deps.settings(shop);
-      const reporter = this.reporter(ShopReporting.enabled(settings.versionReports), shop);
+      const enabled = ShopReporting.enabled(settings.versionReports);
+      if (action.kind === "sendConfiguration" && !enabled) return null;
+      const reporter = this.reporter(enabled, shop, action.kind === "sendConfiguration" ? action.languages : undefined);
       const stored = await this.deps.loadState(shop);
       const state = reporterState(stored);
       const key = settings.apiKey;
@@ -160,6 +174,9 @@ export class ShopReporting {
           break;
         case "authenticationFailed":
           result = await reporter.authenticationFailed(state, key, action.httpStatus);
+          break;
+        case "sendConfiguration":
+          result = await reporter.sendExtensions(state, []);
           break;
         default:
           result = await reporter.onRequest(state, key);

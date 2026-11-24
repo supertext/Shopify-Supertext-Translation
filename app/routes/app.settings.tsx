@@ -96,7 +96,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 };
 
 export const action = async ({ request }: ActionFunctionArgs): Promise<Result> => {
-  const { session } = await authenticate.admin(request);
+  const { admin, session } = await authenticate.admin(request);
   const shop = session.shop;
   const form = await request.formData();
   const intent = form.get("intent");
@@ -104,6 +104,19 @@ export const action = async ({ request }: ActionFunctionArgs): Promise<Result> =
   if (intent === "test") {
     const result = await reporting.testConnection(shop);
     return { ok: result?.check?.status === "ok", key: "keycheck.heading", check: keyCheckView(result?.check) };
+  }
+
+  // "Send configuration to Supertext": the shop's languages with their Supertext codes, for Supertext support.
+  if (intent === "configuration") {
+    const settings = await getSettings(shop);
+    if (!ShopReporting.enabled(settings.versionReports)) return { ok: false, key: "settings.config.off" };
+    const locales = await shopLocales(admin);
+    const languages = locales.map((l) => ({
+      code: l.locale,
+      supertext: l.primary ? resolvedSource(l.locale, settings.languageCodes) : resolvedTarget(l.locale, settings.languageCodes),
+    }));
+    const result = await reporting.sendConfiguration(shop, languages);
+    return result?.sent ? { ok: true, key: "settings.config.sent" } : { ok: false, key: "settings.config.failed" };
   }
 
   if (intent === "remove") {
@@ -347,6 +360,21 @@ export default function Settings() {
         <Form method="post">
           <button type="submit" name="intent" value="test" disabled={busy} style={secondary}>
             {t("settings.test")}
+          </button>
+        </Form>
+      </s-section>
+
+      <s-section slot="aside" heading={t("settings.config.heading")}>
+        <s-paragraph>{t("settings.config.help")}</s-paragraph>
+        <Form method="post" data-supertext-send-configuration>
+          <button
+            type="submit"
+            name="intent"
+            value="configuration"
+            disabled={busy || !data.versionReports || data.versionReportsOffOnServer}
+            style={secondary}
+          >
+            {t("settings.config.button")}
           </button>
         </Form>
       </s-section>

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Added: *Send configuration to Supertext* on the settings page: sends the shop's language mapping to Supertext support in one report (Supertext Plugin Health 0.4.0). Nothing is sent while version reports are off.
+- Changed: version reports go to `https://pluginhealth.supertext.com` (Supertext Plugin Health 0.4.0).
 - Changed: language lists name Supertext's languages the way Supertext's own language list does, in the interface language: *German (Switzerland)*, *Deutsch (Schweiz)*, *allemand (Suisse)*, *tedesco (Svizzera)* instead of *Swiss High German*, *Schweizer Hochdeutsch*, *allemand suisse*, *alto tedesco svizzero* (likewise *French (Switzerland)*, *English (United States)* …).
 - Changed: the Docker image (Railway) runs on Node.js 26, the current LTS (was Node 22); building and running the app still needs Node.js 22.18 or later.
 - Dependencies updated (Shopify App Bridge React 4.3.0, Shopify App React Router 4.0.3, typescript-eslint 8.73.0, Prettier 3.10.1); end-to-end tests on PostgreSQL 18.

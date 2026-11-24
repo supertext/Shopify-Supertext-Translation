@@ -120,6 +120,8 @@ With **Send version information to Supertext** on (the default), the app sends a
 
 No content, no API key, no personal data. The app is hosted by Supertext, so there is no callback address. To turn it off, untick the setting and click **Save**: nothing more is sent, not even an "off" report. The API key check itself still runs, since it only talks to the Supertext API. Supertext can also turn reports off for all shops on the app's server (`SUPERTEXT_VERSION_REPORTS=0`); the setting then shows *Turned off for all shops on the app's server*.
 
+**Send configuration to Supertext** (*Settings → Supertext support*): when you contact Supertext support, this button sends, in one report, your shop's languages with the Supertext language each is sent as. Being a hosted app, there are no plugins to list. Nothing else is sent, and nothing at all while version information is off.
+
 ## Interface languages
 
 The app's own screens (Translate, Settings, messages and errors) are available in English, German, French and Italian. They follow the language of your Shopify admin, which Shopify passes to the app when it opens; other admin languages get English. To change it, click your name in the Shopify admin → **Manage account** → **Preferences** → **Language**, then reopen the app. This only affects the app's interface, not which languages your shop is translated into.
