@@ -6,7 +6,8 @@
 - Changed: version reports go to `https://pluginhealth.supertext.com` (Supertext Plugin Health 0.4.0).
 - Changed: language lists name Supertext's languages the way Supertext's own language list does, in the interface language: *German (Switzerland)*, *Deutsch (Schweiz)*, *allemand (Suisse)*, *tedesco (Svizzera)* instead of *Swiss High German*, *Schweizer Hochdeutsch*, *allemand suisse*, *alto tedesco svizzero* (likewise *French (Switzerland)*, *English (United States)* …).
 - Changed: the Docker image (Railway) runs on Node.js 26, the current LTS (was Node 22); building and running the app still needs Node.js 22.18 or later.
-- Dependencies updated (Shopify App Bridge React 4.3.0, Shopify App React Router 4.0.3, typescript-eslint 8.73.0, Prettier 3.10.1); end-to-end tests on PostgreSQL 18.
+- Dependencies updated (Shopify App Bridge React 4.3.1, Shopify App React Router 4.0.4, Shopify session storage for Prisma 11.0.4, typescript-eslint 8.74.0, Prettier 3.10.1, Vitest 5.1.1); end-to-end tests on PostgreSQL 19.
+- Security: Prisma's command-line tool gets `effect` 3.22.5 (fixes a high-severity ReDoS advisory in its config loader; build and migrations only, no change for shops).
 
 ## 1.0.0 — 2026-11-10
 
