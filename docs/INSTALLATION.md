@@ -76,7 +76,7 @@ Defaults (from the Supertext SDK) for Shopify codes that aren't Supertext codes:
 
 For Swiss German choose `de-CH` (or `fr-CH`, `it-CH` for Switzerland) yourself; nothing else is guessed.
 
-The full list is the one Supertext's API publishes (`GET features`): bg, cs, da, de-AT, de-CH, de-DE, el, en-GB, en-US, es, fi, fr-CH, fr-FR, gsw-u-sd-chbe, gsw-u-sd-chzh, hr, hu, it-CH, it-IT, ja, ko, nb, nl, pl, pt-BR, pt-PT, rm, ru, sk, sl, sq, sr-Cyrl, sr-Latn, sv, tr, zh-Hans, zh-Hant.
+The full list is the one Supertext's API publishes (`GET features`): bg, cs, da, de-AT, de-CH, de-DE, el, en-GB, en-US, es, fi, fr-CH, fr-FR, gsw-u-sd-chbe, gsw-u-sd-chzh, hr, hu, id, it-CH, it-IT, ja, ko, nb, nl, pl, pt-BR, pt-PT, rm, ro, ru, sk, sl, sq, sr-Cyrl, sr-Latn, sv, th, tr, vi, zh-Hans, zh-Hant.
 
 Below each language's combo box (except the default language's) is the **Translation review** checkbox, off by default; see *Translation review*.
 
